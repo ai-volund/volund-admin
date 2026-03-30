@@ -1,60 +1,48 @@
-import { Outlet } from "react-router-dom";
+import { Outlet, useLocation } from "react-router-dom";
 import { AdminSidebar } from "@/components/admin-sidebar";
-import { useTheme } from "@/lib/use-theme";
-import { useSession, signOut } from "@/lib/auth-client";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-  DropdownMenuSeparator,
-} from "@/components/ui/dropdown-menu";
-import { Sun, Moon, Monitor, LogOut, User } from "lucide-react";
+import { SidebarInset, SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
+import { Separator } from "@/components/ui/separator";
+
+const pageTitles: Record<string, string> = {
+  "/": "Dashboard",
+  "/tenants": "Tenants",
+  "/agents": "Agents",
+  "/instances": "Instances",
+  "/skills": "Skills",
+  "/providers": "Connections",
+  "/llm-providers": "LLM Providers",
+  "/usage": "Usage",
+  "/audit": "Audit Log",
+  "/settings": "Settings",
+};
 
 export function Layout() {
-  const { theme, setTheme } = useTheme();
-  const { data: session } = useSession();
+  const location = useLocation();
+  const title =
+    Object.entries(pageTitles).find(([path]) =>
+      path === "/"
+        ? location.pathname === "/"
+        : location.pathname.startsWith(path)
+    )?.[1] ?? "Admin";
 
   return (
-    <div className="flex h-screen bg-background text-foreground">
+    <SidebarProvider>
       <AdminSidebar />
-      <div className="flex-1 flex flex-col min-w-0">
-        <div className="flex items-center justify-between px-6 py-3 border-b shrink-0">
-          <h2 className="text-sm font-medium text-muted-foreground">
-            Platform Administration
-          </h2>
-          <div className="flex items-center gap-2">
-            {session?.user && (
-              <span className="text-sm text-muted-foreground">
-                {session.user.email}
-              </span>
-            )}
-            <DropdownMenu>
-              <DropdownMenuTrigger className="inline-flex items-center justify-center rounded-lg h-9 w-9 hover:bg-accent hover:text-accent-foreground transition-colors">
-                <User className="h-4 w-4" />
-              </DropdownMenuTrigger>
-              <DropdownMenuContent align="end">
-                <DropdownMenuItem onClick={() => setTheme("light")}>
-                  <Sun className="h-4 w-4 mr-2" /> Light
-                </DropdownMenuItem>
-                <DropdownMenuItem onClick={() => setTheme("dark")}>
-                  <Moon className="h-4 w-4 mr-2" /> Dark
-                </DropdownMenuItem>
-                <DropdownMenuItem onClick={() => setTheme("system")}>
-                  <Monitor className="h-4 w-4 mr-2" /> System
-                </DropdownMenuItem>
-                <DropdownMenuSeparator />
-                <DropdownMenuItem onClick={() => signOut()}>
-                  <LogOut className="h-4 w-4 mr-2" /> Sign out
-                </DropdownMenuItem>
-              </DropdownMenuContent>
-            </DropdownMenu>
+      <SidebarInset>
+        <header className="flex h-12 shrink-0 items-center gap-2 border-b transition-[width,height] ease-linear group-has-[[data-collapsible=icon]]/sidebar-wrapper:h-12">
+          <div className="flex items-center gap-2 px-4">
+            <SidebarTrigger className="-ml-1" />
+            <Separator
+              orientation="vertical"
+              className="mr-2 data-[orientation=vertical]:h-4"
+            />
+            <h1 className="text-base font-medium">{title}</h1>
           </div>
-        </div>
-        <div className="flex-1 overflow-auto p-6">
+        </header>
+        <div className="flex flex-1 flex-col overflow-auto p-4 lg:p-6">
           <Outlet />
         </div>
-      </div>
-    </div>
+      </SidebarInset>
+    </SidebarProvider>
   );
 }
