@@ -7,7 +7,9 @@ import {
   Puzzle,
   Link,
   Brain,
+  Cpu,
   BarChart3,
+  ScrollText,
   Settings,
   Shield,
 } from "lucide-react";
@@ -16,10 +18,12 @@ const navItems = [
   { to: "/", icon: LayoutDashboard, label: "Dashboard" },
   { to: "/tenants", icon: Building2, label: "Tenants" },
   { to: "/agents", icon: Bot, label: "Agents" },
+  { to: "/instances", icon: Cpu, label: "Instances" },
   { to: "/skills", icon: Puzzle, label: "Skills" },
   { to: "/providers", icon: Link, label: "Connections" },
   { to: "/llm-providers", icon: Brain, label: "LLM Providers" },
   { to: "/usage", icon: BarChart3, label: "Usage" },
+  { to: "/audit", icon: ScrollText, label: "Audit Log" },
   { to: "/settings", icon: Settings, label: "Settings" },
 ];
 

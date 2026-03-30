@@ -10,7 +10,9 @@ import { AgentsPage } from "@/pages/agents";
 import { SkillsPage } from "@/pages/skills";
 import { ProvidersPage } from "@/pages/providers";
 import { LLMProvidersPage } from "@/pages/llm-providers";
+import { InstancesPage } from "@/pages/instances";
 import { UsagePage } from "@/pages/usage";
+import { AuditPage } from "@/pages/audit";
 import { SettingsPage } from "@/pages/settings";
 
 export default function App() {
@@ -43,6 +45,8 @@ export default function App() {
           <Route path="/skills" element={<SkillsPage />} />
           <Route path="/providers" element={<ProvidersPage />} />
           <Route path="/llm-providers" element={<LLMProvidersPage />} />
+          <Route path="/instances" element={<InstancesPage />} />
+          <Route path="/audit" element={<AuditPage />} />
           <Route path="/usage" element={<UsagePage />} />
           <Route path="/settings" element={<SettingsPage />} />
           <Route path="*" element={<Navigate to="/" replace />} />

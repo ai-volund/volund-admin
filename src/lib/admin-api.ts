@@ -211,11 +211,38 @@ class AdminAPI {
     );
   }
 
+  // ── Instances & Warm Pool ──────────────────────────────────────────────────
+
+  async listInstances() {
+    return this.get<{ instances: Instance[] }>("/v1/admin/instances");
+  }
+
+  async forceReleaseInstance(id: string) {
+    return this.del(`/v1/admin/instances/${id}`);
+  }
+
+  async getWarmPoolStats() {
+    return this.get<WarmPoolStats>("/v1/admin/warmpool");
+  }
+
   // ── Health ────────────────────────────────────────────────────────────────
+
+  async platformHealth() {
+    return this.get<PlatformHealth>("/v1/admin/health");
+  }
 
   async healthCheck() {
     const res = await fetch(`${GATEWAY_URL}/healthz`);
     return res.json();
+  }
+
+  // ── Audit ─────────────────────────────────────────────────────────────────
+
+  async listAudit(limit?: number, tenantId?: string) {
+    const params = new URLSearchParams();
+    if (limit) params.set("limit", String(limit));
+    if (tenantId) params.set("tenant_id", tenantId);
+    return this.get<{ entries: AuditEntry[] }>(`/v1/admin/audit?${params}`);
   }
 }
 
@@ -320,6 +347,45 @@ export interface QuotaStatus {
   plan: string;
   limits: Record<string, number>;
   usage: Record<string, number>;
+}
+
+export interface Instance {
+  id: string;
+  tenant_id: string;
+  profile_id?: string;
+  pod_name?: string;
+  pod_namespace?: string;
+  state: string;
+  claimed_at?: string;
+  last_heartbeat?: string;
+  created_at: string;
+}
+
+export interface WarmPoolStats {
+  total: number;
+  available: number;
+  claimed: number;
+  active: number;
+}
+
+export interface PlatformHealth {
+  gateway: { status: string };
+  postgres: { status: string; error?: string };
+  auth: { status: string; error?: string };
+  warm_pool?: { status: string; total?: number; available?: number; claimed?: number; active?: number };
+}
+
+export interface AuditEntry {
+  id: string;
+  tenant_id: string;
+  user_id: string;
+  action: string;
+  resource: string;
+  resource_id: string;
+  detail: Record<string, unknown>;
+  ip_address: string;
+  user_agent: string;
+  created_at: string;
 }
 
 export const adminApi = new AdminAPI();

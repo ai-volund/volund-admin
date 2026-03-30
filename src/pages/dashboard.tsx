@@ -1,22 +1,24 @@
 import { useEffect, useState } from "react";
 import { adminApi } from "@/lib/admin-api";
-import type { Tenant, UsageSummary } from "@/lib/admin-api";
+import type { Tenant, UsageSummary, PlatformHealth, WarmPoolStats } from "@/lib/admin-api";
 import { StatCard } from "@/components/stat-card";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Building2, Bot, Zap, Activity } from "lucide-react";
+import { Building2, Bot, Zap, Activity, Server } from "lucide-react";
 
 export function DashboardPage() {
   const [tenants, setTenants] = useState<Tenant[]>([]);
   const [usage, setUsage] = useState<UsageSummary | null>(null);
-  const [health, setHealth] = useState<{ status: string } | null>(null);
+  const [health, setHealth] = useState<PlatformHealth | null>(null);
+  const [warmPool, setWarmPool] = useState<WarmPoolStats | null>(null);
   const [error, setError] = useState("");
 
   useEffect(() => {
     Promise.allSettled([
       adminApi.listTenants().then((d) => setTenants(d.tenants)),
       adminApi.getUsageSummary().then(setUsage),
-      adminApi.healthCheck().then(setHealth),
+      adminApi.platformHealth().then(setHealth),
+      adminApi.getWarmPoolStats().then(setWarmPool),
     ]).then((results) => {
       const failed = results.filter((r) => r.status === "rejected");
       if (failed.length === results.length) setError("Failed to load dashboard data");
@@ -32,6 +34,12 @@ export function DashboardPage() {
     );
   }
 
+  const healthBadge = (svc: { status: string } | undefined) => (
+    <Badge variant={svc?.status === "ok" ? "default" : "destructive"}>
+      {svc?.status ?? "unknown"}
+    </Badge>
+  );
+
   return (
     <div className="space-y-6">
       <div>
@@ -42,12 +50,37 @@ export function DashboardPage() {
       </div>
 
       {/* Health */}
-      <div className="flex items-center gap-2">
-        <span className="text-sm text-muted-foreground">Gateway:</span>
-        <Badge variant={health?.status === "ok" ? "default" : "destructive"}>
-          {health?.status ?? "checking..."}
-        </Badge>
-      </div>
+      <Card>
+        <CardHeader>
+          <CardTitle className="text-lg flex items-center gap-2">
+            <Server className="h-4 w-4" /> Platform Health
+          </CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="flex flex-wrap gap-4">
+            <div className="flex items-center gap-2">
+              <span className="text-sm text-muted-foreground">Gateway:</span>
+              {healthBadge(health?.gateway)}
+            </div>
+            <div className="flex items-center gap-2">
+              <span className="text-sm text-muted-foreground">PostgreSQL:</span>
+              {healthBadge(health?.postgres)}
+            </div>
+            <div className="flex items-center gap-2">
+              <span className="text-sm text-muted-foreground">Auth:</span>
+              {healthBadge(health?.auth)}
+            </div>
+            {warmPool && (
+              <div className="flex items-center gap-2">
+                <span className="text-sm text-muted-foreground">Warm Pool:</span>
+                <Badge variant="default">
+                  {warmPool.available} free / {warmPool.total} total
+                </Badge>
+              </div>
+            )}
+          </div>
+        </CardContent>
+      </Card>
 
       {/* Stats */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
