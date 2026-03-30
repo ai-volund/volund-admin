@@ -40,11 +40,11 @@ export function LLMProvidersPage() {
   });
 
   const load = () => {
-    adminApi.listLLMProviders().then((d) => setProviders(d.providers ?? [])).catch(() => {});
+    adminApi.listLLMProviders().then((d) => setProviders(d.providers ?? [])).catch(() => setProviders([]));
     adminApi.listLLMModels().then((d) => {
-      const m = (d.models as { id: string }[]) ?? [];
-      setModels(m.map((x) => x.id ?? (x as unknown as string)));
-    }).catch(() => {});
+      const raw = d.models ?? [];
+      setModels(raw.map((x: Record<string, unknown>) => (x.ID ?? x.id ?? String(x)) as string));
+    }).catch(() => setModels([]));
   };
 
   useEffect(load, []);
