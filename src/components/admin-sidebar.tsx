@@ -6,6 +6,7 @@ import {
   Bot,
   Puzzle,
   Link,
+  Brain,
   BarChart3,
   Settings,
   Shield,
@@ -16,7 +17,8 @@ const navItems = [
   { to: "/tenants", icon: Building2, label: "Tenants" },
   { to: "/agents", icon: Bot, label: "Agents" },
   { to: "/skills", icon: Puzzle, label: "Skills" },
-  { to: "/providers", icon: Link, label: "Providers" },
+  { to: "/providers", icon: Link, label: "Connections" },
+  { to: "/llm-providers", icon: Brain, label: "LLM Providers" },
   { to: "/usage", icon: BarChart3, label: "Usage" },
   { to: "/settings", icon: Settings, label: "Settings" },
 ];

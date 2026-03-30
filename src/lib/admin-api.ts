@@ -175,6 +175,42 @@ class AdminAPI {
     return this.get<QuotaStatus>("/v1/usage/quota");
   }
 
+  // ── LLM Providers ──────────────────────────────────────────────────────────
+
+  async listLLMProviders() {
+    return this.get<{ providers: LLMProviderConfig[] }>("/v1/admin/llm/providers");
+  }
+
+  async createLLMProvider(data: {
+    name: string;
+    type: string;
+    api_key?: string;
+    base_url?: string;
+    priority?: number;
+  }) {
+    return this.post<LLMProviderConfig>("/v1/admin/llm/providers", data);
+  }
+
+  async updateLLMProvider(id: string, data: Partial<LLMProviderConfig>) {
+    return this.put<LLMProviderConfig>(`/v1/admin/llm/providers/${id}`, data);
+  }
+
+  async deleteLLMProvider(id: string) {
+    return this.del(`/v1/admin/llm/providers/${id}`);
+  }
+
+  async testLLMProvider(id: string) {
+    return this.post<{ status: string; models?: string[]; error?: string }>(
+      `/v1/admin/llm/providers/${id}/test`
+    );
+  }
+
+  async listLLMModels() {
+    return this.get<{ models: { id: string; provider: string; name: string }[] }>(
+      "/v1/admin/llm/models"
+    );
+  }
+
   // ── Health ────────────────────────────────────────────────────────────────
 
   async healthCheck() {
@@ -264,6 +300,19 @@ export interface UsageBreakdown {
     requests: number;
     estimated_cost: number;
   }[];
+}
+
+export interface LLMProviderConfig {
+  id: string;
+  name: string;
+  type: string;
+  api_key: string;
+  base_url: string;
+  config: Record<string, unknown>;
+  enabled: boolean;
+  priority: number;
+  created_at: string;
+  updated_at: string;
 }
 
 export interface QuotaStatus {
