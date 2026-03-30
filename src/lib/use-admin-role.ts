@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { useSession } from "@/lib/auth-client";
 
-const ADMIN_ROLES = ["platform_admin", "admin", "owner"];
+const ADMIN_ROLES = ["platform_admin", "admin"];
 const AUTH_URL = import.meta.env.VITE_AUTH_URL || "http://localhost:3456";
 
 interface AdminRoleState {

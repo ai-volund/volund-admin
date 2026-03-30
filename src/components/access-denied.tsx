@@ -15,8 +15,8 @@ export function AccessDenied({ role }: { role: string | null }) {
         </CardHeader>
         <CardContent className="space-y-4">
           <p className="text-sm text-muted-foreground">
-            The admin console requires <strong>platform_admin</strong>,{" "}
-            <strong>admin</strong>, or <strong>owner</strong> role.
+            The admin console requires <strong>platform_admin</strong> or{" "}
+            <strong>admin</strong> role.
           </p>
           {role && (
             <p className="text-sm text-muted-foreground">
