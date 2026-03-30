@@ -1,14 +1,8 @@
 import { useState, type FormEvent } from "react";
 import { signIn, signUp } from "@/lib/auth-client";
 import { Button } from "@/components/ui/button";
+import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
 import { Loader2, Shield } from "lucide-react";
 
 export function Login() {
@@ -25,110 +19,140 @@ export function Login() {
     setLoading(true);
     try {
       if (mode === "register") {
-        const { error } = await signUp.email({
-          email,
-          password,
-          name,
-        });
+        const { error } = await signUp.email({ email, password, name });
         if (error) throw new Error(error.message);
       } else {
-        const { error } = await signIn.email({
-          email,
-          password,
-        });
+        const { error } = await signIn.email({ email, password });
         if (error) throw new Error(error.message);
       }
     } catch (err) {
-      setError(
-        err instanceof Error ? err.message : "Authentication failed"
-      );
+      setError(err instanceof Error ? err.message : "Authentication failed");
     } finally {
       setLoading(false);
     }
   };
 
   return (
-    <div className="flex items-center justify-center min-h-screen bg-background">
-      <Card className="w-full max-w-sm">
-        <CardHeader className="text-center">
-          <div className="flex justify-center mb-2">
-            <Shield className="h-8 w-8 text-primary" />
-          </div>
-          <CardTitle className="text-2xl font-bold tracking-tight">
-            Volund Admin
-          </CardTitle>
-          <CardDescription>
-            {mode === "login"
-              ? "Sign in to the admin console"
-              : "Create an admin account"}
-          </CardDescription>
-        </CardHeader>
-        <CardContent className="space-y-4">
-          <form onSubmit={handleSubmit} className="space-y-4">
-            {mode === "register" && (
-              <Input
-                placeholder="Name"
-                value={name}
-                onChange={(e) => setName(e.target.value)}
-                required
-              />
-            )}
-            <Input
-              type="email"
-              placeholder="Email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              required
-            />
-            <Input
-              type="password"
-              placeholder="Password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              required
-              minLength={8}
-            />
-            {error && <p className="text-sm text-destructive">{error}</p>}
-            <Button type="submit" className="w-full" disabled={loading}>
-              {loading ? (
-                <>
-                  <Loader2 className="h-4 w-4 animate-spin mr-2" />
-                  {mode === "register" ? "Creating..." : "Signing in..."}
-                </>
-              ) : mode === "register" ? (
-                "Create account"
-              ) : (
-                "Sign in"
-              )}
-            </Button>
-          </form>
-          <p className="text-center text-sm text-muted-foreground">
-            {mode === "login" ? (
-              <>
-                No account?{" "}
-                <button
-                  type="button"
-                  className="underline hover:text-foreground"
-                  onClick={() => { setMode("register"); setError(""); }}
-                >
-                  Sign up
-                </button>
-              </>
-            ) : (
-              <>
-                Have an account?{" "}
-                <button
-                  type="button"
-                  className="underline hover:text-foreground"
-                  onClick={() => { setMode("login"); setError(""); }}
-                >
-                  Sign in
-                </button>
-              </>
-            )}
-          </p>
-        </CardContent>
-      </Card>
+    <div className="flex min-h-svh flex-col items-center justify-center bg-muted p-6 md:p-10">
+      <div className="w-full max-w-sm md:max-w-3xl">
+        <div className="flex flex-col gap-6">
+          <Card className="overflow-hidden">
+            <CardContent className="grid p-0 md:grid-cols-2">
+              <form className="p-6 md:p-8" onSubmit={handleSubmit}>
+                <div className="flex flex-col gap-6">
+                  <div className="flex flex-col items-center text-center">
+                    <h1 className="text-2xl font-bold">
+                      {mode === "login" ? "Admin Console" : "Create admin account"}
+                    </h1>
+                    <p className="text-balance text-muted-foreground">
+                      {mode === "login"
+                        ? "Sign in to the platform admin console"
+                        : "Set up your administrator account"}
+                    </p>
+                  </div>
+                  {mode === "register" && (
+                    <div className="grid gap-2">
+                      <label htmlFor="name" className="text-sm font-medium">
+                        Name
+                      </label>
+                      <Input
+                        id="name"
+                        placeholder="Your name"
+                        value={name}
+                        onChange={(e) => setName(e.target.value)}
+                        required
+                      />
+                    </div>
+                  )}
+                  <div className="grid gap-2">
+                    <label htmlFor="email" className="text-sm font-medium">
+                      Email
+                    </label>
+                    <Input
+                      id="email"
+                      type="email"
+                      placeholder="admin@example.com"
+                      value={email}
+                      onChange={(e) => setEmail(e.target.value)}
+                      required
+                    />
+                  </div>
+                  <div className="grid gap-2">
+                    <label htmlFor="password" className="text-sm font-medium">
+                      Password
+                    </label>
+                    <Input
+                      id="password"
+                      type="password"
+                      placeholder="••••••••"
+                      value={password}
+                      onChange={(e) => setPassword(e.target.value)}
+                      required
+                      minLength={8}
+                    />
+                  </div>
+                  {error && (
+                    <p className="text-sm text-destructive text-center">
+                      {error}
+                    </p>
+                  )}
+                  <Button type="submit" className="w-full" disabled={loading}>
+                    {loading ? (
+                      <>
+                        <Loader2 className="h-4 w-4 animate-spin mr-2" />
+                        {mode === "register" ? "Creating..." : "Signing in..."}
+                      </>
+                    ) : mode === "register" ? (
+                      "Create account"
+                    ) : (
+                      "Sign in"
+                    )}
+                  </Button>
+                  <p className="text-center text-sm text-muted-foreground">
+                    {mode === "login" ? (
+                      <>
+                        Need an account?{" "}
+                        <button
+                          type="button"
+                          className="underline underline-offset-4 hover:text-primary"
+                          onClick={() => { setMode("register"); setError(""); }}
+                        >
+                          Sign up
+                        </button>
+                      </>
+                    ) : (
+                      <>
+                        Have an account?{" "}
+                        <button
+                          type="button"
+                          className="underline underline-offset-4 hover:text-primary"
+                          onClick={() => { setMode("login"); setError(""); }}
+                        >
+                          Sign in
+                        </button>
+                      </>
+                    )}
+                  </p>
+                </div>
+              </form>
+              <div className="relative hidden bg-muted md:block">
+                <div className="absolute inset-0 flex items-center justify-center">
+                  <div className="text-center space-y-4 px-8">
+                    <Shield className="h-16 w-16 mx-auto text-primary/10" />
+                    <p className="text-lg font-medium text-muted-foreground/60">
+                      Volund Admin
+                    </p>
+                    <p className="text-sm text-muted-foreground/40">
+                      Manage tenants, agents, skills, LLM providers, and platform
+                      configuration.
+                    </p>
+                  </div>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+      </div>
     </div>
   );
 }
